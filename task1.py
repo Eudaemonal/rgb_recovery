@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 
 
-# Match im1 and im2
+# Match im2 onto im1
 def match_offset(im1, im2, mid, movement, crop, w_c, h_c):
 	max_diff = 0
 	max_i = 0
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
 	# Create array of RGB values
 	im_g = img[0 : h, 0:w] 
-	im_b = img[h : 2*h, 0:w]
+	im_b = img[h :2*h, 0:w]
 	im_r = img[2*h : 3*h, 0:w]
 
 	# Calculate offset using cross correlation
