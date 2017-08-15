@@ -6,8 +6,6 @@ import cv2
 import math
 
 
-
-
 # Match im2 onto im1
 def match_offset(im1, im2, crop, movement):
 	h,w = im1.shape

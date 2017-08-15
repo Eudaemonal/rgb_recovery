@@ -67,7 +67,7 @@ def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s1.jpg',0)
+	img = cv2.imread('./DataSamples/h1.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
