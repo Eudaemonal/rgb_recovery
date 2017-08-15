@@ -2,9 +2,7 @@
 
 import numpy as np
 import cv2
-import imutils
 from matplotlib import pyplot as plt
-
 
 
 # Match im2 onto im1
@@ -12,6 +10,9 @@ def match_offset(im1, im2, crop, movement):
 	h,w = im1.shape
 	w_c = int(w/2)
 	h_c = int(h/2)
+
+	w_window = int(w_c*crop/100)
+	h_window = int(h_c*crop/100)
 
 	# Find mid point of grey scale
 	sample = im1[h_c - crop :h_c + crop, w_c - crop:w_c + crop]
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 	h = int(height/3)
 	w = width
 	movement = 20
-	crop = 20
+	crop = 12  # percentage for crop
 
 	# Create array of RGB values
 	im_b = img[0 : h, 0:w] 
