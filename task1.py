@@ -10,6 +10,8 @@ def match_offset(im1, im2, crop, movement):
 	h,w = im1.shape
 	w_c = int(w/2)
 	h_c = int(h/2)
+	if(crop>100):
+		crop = 100
 
 	w_window = int(w_c*crop/100)
 	h_window = int(h_c*crop/100)
@@ -27,7 +29,7 @@ def match_offset(im1, im2, crop, movement):
 			diff = 0
 			for i in range(w_c - crop,w_c + crop):
 				for j in range(h_c - crop,h_c + crop):
-					if((0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)):
+					if((0<=i)&(i < w)&(0<=j)&(j< h)&(0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)):
 						diff += (im1[j, i]-mid) * (im2[j+j_offset, i+i_offset]-mid)
 					
 			if(diff > max_diff):
@@ -56,8 +58,12 @@ def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
 			if((0<=i+offir)&(i+offir < w)&(0<=j+offjr)&(j+offjr< h)):
 				rec_img[j,i,2] = R[j+offjr, i+offir]
 
-	return rec_img
+	crop_i = max(abs(offig), abs(offir))
+	crop_j = max(abs(offjg), abs(offjr))
 
+	crop_img = rec_img[crop_j:h-crop_j, crop_i:w-crop_i]
+
+	return crop_img
 
 
 if __name__ == "__main__":
@@ -82,7 +88,7 @@ if __name__ == "__main__":
 	# Create reconstruct image
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)
 
-	cv2.imshow("cropped", rec_img)
+	cv2.imshow("reconstructed", rec_img)
 	cv2.waitKey(0)
 
 

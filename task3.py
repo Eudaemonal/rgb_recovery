@@ -5,12 +5,13 @@ import cv2
 from matplotlib import pyplot as plt
 
 
-
 # Match im2 onto im1
 def match_offset(im1, im2, crop, movement):
 	h,w = im1.shape
 	w_c = int(w/2)
 	h_c = int(h/2)
+	if(crop>100):
+		crop = 100
 
 	w_window = int(w_c*crop/100)
 	h_window = int(h_c*crop/100)
@@ -28,7 +29,7 @@ def match_offset(im1, im2, crop, movement):
 			diff = 0
 			for i in range(w_c - crop,w_c + crop):
 				for j in range(h_c - crop,h_c + crop):
-					if((0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)):
+					if((0<=i)&(i < w)&(0<=j)&(j< h)&(0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)):
 						diff += (im1[j, i]-mid) * (im2[j+j_offset, i+i_offset]-mid)
 					
 			if(diff > max_diff):
@@ -39,6 +40,7 @@ def match_offset(im1, im2, crop, movement):
 	print("max: %3d %3d %d"%(max_i, max_j, max_diff))
 
 	return max_i, max_j 
+
 
 
 def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
@@ -57,8 +59,35 @@ def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
 			if((0<=i+offir)&(i+offir < w)&(0<=j+offjr)&(j+offjr< h)):
 				rec_img[j,i,2] = R[j+offjr, i+offir]
 
-	return rec_img
+	crop_i = max(abs(offig), abs(offir))
+	crop_j = max(abs(offjg), abs(offjr))
 
+	crop_img = rec_img[crop_j:h-crop_j, crop_i:w-crop_i]
+
+	return crop_img
+
+
+def auto_canny(image, sigma=0.33):
+	# compute the median of the single channel pixel intensities
+	v = np.median(image)
+ 
+	# apply automatic Canny edge detection using the computed median
+	lower = int(max(0, (1.0 - sigma) * v))
+	upper = int(min(255, (1.0 + sigma) * v))
+	edged = cv2.Canny(image, lower, upper)
+ 
+	# return the edged image
+	return edged
+
+
+# Histograms equalization for RGB channels
+def white_balance(img):
+	h, w, d = img.shape
+	ret = np.zeros((h,w,d), np.uint8)
+	ret[:,:,0] = cv2.equalizeHist(img[:,:,0])
+	ret[:,:,1] = cv2.equalizeHist(img[:,:,1])
+	ret[:,:,2] = cv2.equalizeHist(img[:,:,2])
+	return ret
 
 
 if __name__ == "__main__":
@@ -82,8 +111,8 @@ if __name__ == "__main__":
 
 	# Create reconstruct image
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)
+	ret_img = white_balance(rec_img)
 
-	cv2.imshow("cropped", rec_img)
+	cv2.imshow("reconstructed", ret_img)
 	cv2.waitKey(0)
-
 

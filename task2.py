@@ -6,11 +6,18 @@ import cv2
 import math
 
 
+
+
 # Match im2 onto im1
 def match_offset(im1, im2, crop, movement):
 	h,w = im1.shape
 	w_c = int(w/2)
 	h_c = int(h/2)
+	if(crop>100):
+		crop = 100
+
+	w_window = int(w_c*crop/100)
+	h_window = int(h_c*crop/100)
 
 	# Find mid point of grey scale
 	sample = im1[h_c - crop :h_c + crop, w_c - crop:w_c + crop]
@@ -25,7 +32,7 @@ def match_offset(im1, im2, crop, movement):
 			diff = 0
 			for i in range(w_c - crop,w_c + crop):
 				for j in range(h_c - crop,h_c + crop):
-					if((0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)&(0<=i)&(i< w)&(0<=j)&(j< h)):
+					if((0<=i)&(i < w)&(0<=j)&(j< h)&(0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)):
 						diff += (im1[j, i]-mid) * (im2[j+j_offset, i+i_offset]-mid)
 					
 			if(diff > max_diff):
@@ -35,10 +42,11 @@ def match_offset(im1, im2, crop, movement):
 
 	return max_i, max_j 
 
+
 # Move image based on offset
 def move_image(img, offj, offi):
 	h, w = img.shape
-	ret_img = np.zeros((h,w,1), np.uint8)
+	ret_img = np.zeros((h,w), np.uint8)
 	for i in range(0,w):
 		for j in range(0,h):
 			if((0<=i+offi)&(i+offi < w)&(0<=j+offj)&(j+offj< h)):
@@ -78,14 +86,14 @@ def img_pyramid(img, min_reso):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s1.jpg',0)
+	img = cv2.imread('./DataSamples/s5.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
 	h = int(height/3)
 	w = width
 	movement = 2
-	crop = 120
+	crop = 20
 	min_reso = int(w/10)
 
 
@@ -101,18 +109,27 @@ if __name__ == "__main__":
 
 	idx = len(arr_g) -1
 	
+	ig = 0
+	jg = 0
+	ir = 0
+	jr = 0
+
 	while(idx>0):
 		print("idx: %d"%(idx))
 		# Calculate offset using cross correlation
-		offig, offjg = match_offset(arr_b[idx], arr_g[idx],movement, movement)
-		offir, offjr = match_offset(arr_b[idx], arr_r[idx],movement, movement)
+		offig, offjg = match_offset(arr_b[idx], arr_g[idx],100, movement)
+		offir, offjr = match_offset(arr_b[idx], arr_r[idx],100, movement)
 
 		print("max: %3d %3d"%(offig*2**idx, offjg*2**idx))
 		print("max: %3d %3d"%(offir*2**idx, offjr*2**idx))
 
+		ig += offig*2**idx
+		jg += offjg*2**idx
+		ir += offir*2**idx
+		jr += offjr*2**idx
 
-		move_image(arr_b[idx-1], offjg*2, offig*2)
-		move_image(arr_r[idx-1], offjr*2, offir*2)
+		arr_g[idx-1] = move_image(arr_g[idx-1], offjg*2, offig*2)
+		arr_r[idx-1] = move_image(arr_r[idx-1], offjr*2, offir*2)
 
 		idx = idx - 1
 
@@ -120,11 +137,18 @@ if __name__ == "__main__":
 	offir, offjr = match_offset(arr_b[idx], arr_r[idx],crop, movement)
 
 	print("idx: %d"%(idx))
-	print("max: %3d %3d"%(offig*2**idx, offjg*2**idx))
-	print("max: %3d %3d"%(offir*2**idx, offjr*2**idx))
+	print("max: %3d %3d"%(offig, offjg))
+	print("max: %3d %3d"%(offir, offjr))
+	ig += offig*2**idx
+	jg += offjg*2**idx
+	ir += offir*2**idx
+	jr += offjr*2**idx
+
+	print("final max: %3d %3d"%(ig, jg))
+	print("final max: %3d %3d"%(ir, jr))
 
 	# Create reconstruct image
-	rec_img = img_reconstruct(arr_b[0], arr_g[0], arr_r[0], offjg, offig, offjr, offir)
+	rec_img = img_reconstruct(im_b, im_g, im_r, jg, ig, jr, ir)
 
-	cv2.imshow("cropped", rec_img)
+	cv2.imshow("reconstructed", rec_img)
 	cv2.waitKey(0)
