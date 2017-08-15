@@ -20,7 +20,7 @@ def match_offset(im1, im2, crop, movement):
 	h_window = int(h_c*crop/100)
 
 	# Find mid point of grey scale
-	sample = im1[h_c - crop :h_c + crop, w_c - crop:w_c + crop]
+	sample = im1[h_c - h_window :h_c + h_window, w_c - w_window:w_c + w_window]
 	ret, imgf = cv2.threshold(sample, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 	mid = int(ret)
 
@@ -30,8 +30,8 @@ def match_offset(im1, im2, crop, movement):
 	for i_offset in range(-movement, movement):
 		for j_offset in range(-movement, movement):
 			diff = 0
-			for i in range(w_c - crop,w_c + crop):
-				for j in range(h_c - crop,h_c + crop):
+			for i in range(w_c - w_window,w_c + w_window):
+				for j in range(h_c - h_window,h_c + h_window):
 					if((0<=i)&(i < w)&(0<=j)&(j< h)&(0<=i+i_offset)&(i+i_offset < w)&(0<=j+j_offset)&(j+j_offset< h)):
 						diff += (im1[j, i]-mid) * (im2[j+j_offset, i+i_offset]-mid)
 					
@@ -39,6 +39,7 @@ def match_offset(im1, im2, crop, movement):
 				max_diff = diff
 				max_i = i_offset
 				max_j = j_offset
+
 
 	return max_i, max_j 
 
