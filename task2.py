@@ -95,7 +95,6 @@ if __name__ == "__main__":
 	crop = 20
 	min_reso = int(w/10)
 
-
 	# Create array of RGB values
 	im_b = img[0 : h, 0:w] 
 	im_g = img[h : 2*h, 0:w]

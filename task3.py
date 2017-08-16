@@ -80,6 +80,35 @@ def auto_canny(image, sigma=0.33):
 	return edged
 
 
+
+def auto_crop(img, cut):
+	up = 0
+	left = 0
+	down, right,deep = img.shape
+
+	edges = auto_canny(img)
+
+	lines = cv2.HoughLinesP(edges, 1, np.pi/180, 25, minLineLength=240, maxLineGap=10)
+	hough = np.zeros(edges.shape, np.uint8)
+
+	for line in lines:
+		x1, y1, x2, y2 = line[0]
+		cv2.line(hough, (x1, y1), (x2, y2), (255, 0, 0), 1)
+		print("(%3d, %3d) (%3d, %3d)"%(x1, y1, x2, y2))
+
+		if(x1==x2):
+			if(x1 < cut):
+				left = x1
+			elif(x1 > right-cut):
+				right = x1
+		elif(y1==y2):
+			if(y1 < cut):
+				up = y1
+			elif(x1 > down-cut):
+				down = y1
+
+	return img[up:down, left:right]
+
 # Histograms equalization for RGB channels
 def white_balance(img):
 	h, w, d = img.shape
@@ -91,7 +120,7 @@ def white_balance(img):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s1.jpg',0)
+	img = cv2.imread('./DataSamples/s2.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
@@ -99,6 +128,7 @@ if __name__ == "__main__":
 	w = width
 	movement = 12
 	crop = 8  # percentage for crop
+	cut = 20
 
 	# Create array of RGB values
 	im_b = img[0 : h, 0:w] 
@@ -111,24 +141,14 @@ if __name__ == "__main__":
 
 	# Create reconstruct image
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)
-	
-	edges = auto_canny(rec_img)
 
-	minLineLength = 10
-	maxLineGap = 1
-	lines = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength,maxLineGap)
-	for x1,y1,x2,y2 in lines[0]:
-	    cv2.line(img,(x1,y1),(x2,y2),(0,255,0),2)
-	    print("(%3d, %3d) (%3d, %3d)"%(x1, y1, x2, y2))
+	# Automatic cropping
+	ret_img = auto_crop(rec_img, cut)
 
-	cv2.imshow("edge", edges)
+	# image white balance
+	ret_img = white_balance(ret_img)
+
+	cv2.imshow("result", ret_img)
 	cv2.waitKey(0)
 
 
-'''
-	ret_img = white_balance(rec_img)
-
-	cv2.imwrite("s5_rec.jpg", rec_img)
-	cv2.waitKey(0)
-
-'''
