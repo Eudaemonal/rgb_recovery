@@ -122,7 +122,7 @@ def white_balance(img):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s1.jpg',0)
+	img = cv2.imread('./DataSamples/s5.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
