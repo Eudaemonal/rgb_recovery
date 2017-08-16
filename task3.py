@@ -97,7 +97,7 @@ if __name__ == "__main__":
 	height, width = img.shape 
 	h = int(height/3)
 	w = width
-	movement = 20
+	movement = 12
 	crop = 8  # percentage for crop
 
 	# Create array of RGB values
@@ -111,8 +111,24 @@ if __name__ == "__main__":
 
 	# Create reconstruct image
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)
-	ret_img = white_balance(rec_img)
+	
+	edges = auto_canny(rec_img)
 
-	cv2.imshow("reconstructed", ret_img)
+	minLineLength = 10
+	maxLineGap = 1
+	lines = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength,maxLineGap)
+	for x1,y1,x2,y2 in lines[0]:
+	    cv2.line(img,(x1,y1),(x2,y2),(0,255,0),2)
+	    print("(%3d, %3d) (%3d, %3d)"%(x1, y1, x2, y2))
+
+	cv2.imshow("edge", edges)
 	cv2.waitKey(0)
 
+
+'''
+	ret_img = white_balance(rec_img)
+
+	cv2.imwrite("s5_rec.jpg", rec_img)
+	cv2.waitKey(0)
+
+'''

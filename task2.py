@@ -85,7 +85,7 @@ def img_pyramid(img, min_reso):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s5.jpg',0)
+	img = cv2.imread('./DataSamples/s1.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
@@ -122,13 +122,13 @@ if __name__ == "__main__":
 		print("max: %3d %3d"%(offig*2**idx, offjg*2**idx))
 		print("max: %3d %3d"%(offir*2**idx, offjr*2**idx))
 
-		ig += offig*2**idx
-		jg += offjg*2**idx
-		ir += offir*2**idx
-		jr += offjr*2**idx
+		ig = ig*2 + offig*2
+		jg = jg*2 + offjg*2
+		ir = ir*2 + offir*2
+		jr = jr*2 + offjr*2
 
-		arr_g[idx-1] = move_image(arr_g[idx-1], offjg*2, offig*2)
-		arr_r[idx-1] = move_image(arr_r[idx-1], offjr*2, offir*2)
+		arr_g[idx-1] = move_image(arr_g[idx-1], jg, ig)
+		arr_r[idx-1] = move_image(arr_r[idx-1], jr, ir)
 
 		idx = idx - 1
 
@@ -138,10 +138,10 @@ if __name__ == "__main__":
 	print("idx: %d"%(idx))
 	print("max: %3d %3d"%(offig, offjg))
 	print("max: %3d %3d"%(offir, offjr))
-	ig += offig*2**idx
-	jg += offjg*2**idx
-	ir += offir*2**idx
-	jr += offjr*2**idx
+	ig = ig + offig
+	jg = jg + offjg
+	ir = ir + offir
+	jr = jr + offjr
 
 	print("final max: %3d %3d"%(ig, jg))
 	print("final max: %3d %3d"%(ir, jr))

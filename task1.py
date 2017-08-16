@@ -67,10 +67,10 @@ def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/h1.jpg',0)
+	img = cv2.imread('./DataSamples/s5.jpg',0)
 
 	# Variable init
-	height, width = img.shape 
+	height, width = img.shape
 	h = int(height/3)
 	w = width
 	movement = 20
@@ -89,6 +89,6 @@ if __name__ == "__main__":
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)
 
 	cv2.imshow("reconstructed", rec_img)
-	cv2.waitKey(0)
-
+	cv2.waitKey()
+	#cv2.imwrite("s5_res.jpg", rec_img)
 
