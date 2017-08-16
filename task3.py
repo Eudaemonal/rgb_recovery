@@ -84,11 +84,13 @@ def auto_canny(image, sigma=0.33):
 def auto_crop(img, cut):
 	up = 0
 	left = 0
-	down, right,deep = img.shape
+	down, right, deep = img.shape
+
+	minLen = int(min(down, right)*0.9)
 
 	edges = auto_canny(img)
 
-	lines = cv2.HoughLinesP(edges, 1, np.pi/180, 25, minLineLength=240, maxLineGap=10)
+	lines = cv2.HoughLinesP(edges, 1, np.pi/180, 25, minLen, maxLineGap=10)
 	hough = np.zeros(edges.shape, np.uint8)
 
 	for line in lines:
@@ -104,7 +106,7 @@ def auto_crop(img, cut):
 		elif(y1==y2):
 			if(y1 < cut):
 				up = y1
-			elif(x1 > down-cut):
+			elif(y1 > down-cut):
 				down = y1
 
 	return img[up:down, left:right]
@@ -120,7 +122,7 @@ def white_balance(img):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s2.jpg',0)
+	img = cv2.imread('./DataSamples/s1.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
