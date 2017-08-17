@@ -81,8 +81,11 @@ def auto_canny(image, sigma=0.33):
 	# return the edged image
 	return edged
 
+
+# t5
+
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/t4.jpg',0)
+	img = cv2.imread('./DataSamples/s1.jpg',0)
 
 	# Variable init
 	height, width = img.shape

@@ -97,7 +97,7 @@ def auto_canny(image, sigma=0.33):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/h1.jpg',0)
+	img = cv2.imread('./DataSamples/h2.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
 	w = width
 	movement = 2
 	crop = 20
-	min_reso = int(w/20)
+	min_reso = 32 # int(w/10)
 
 	# Create array of RGB values
 	im_b = img[0 : h, 0:w] 
