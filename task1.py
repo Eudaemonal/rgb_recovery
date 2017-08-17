@@ -42,6 +42,8 @@ def match_offset(im1, im2, crop, movement):
 	return max_i, max_j 
 
 
+
+
 def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
 	h, w = B.shape
 	rec_img = np.zeros((h,w,3), np.uint8)
@@ -66,8 +68,21 @@ def img_reconstruct(B, G, R, offjg, offig, offjr, offir):
 	return crop_img
 
 
+
+def auto_canny(image, sigma=0.33):
+	# compute the median of the single channel pixel intensities
+	v = np.median(image)
+ 
+	# apply automatic Canny edge detection using the computed median
+	lower = int(max(0, (1.0 - sigma) * v))
+	upper = int(min(255, (1.0 + sigma) * v))
+	edged = cv2.Canny(image, lower, upper)
+ 
+	# return the edged image
+	return edged
+
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s5.jpg',0)
+	img = cv2.imread('./DataSamples/t4.jpg',0)
 
 	# Variable init
 	height, width = img.shape
@@ -81,9 +96,14 @@ if __name__ == "__main__":
 	im_g = img[h :2*h, 0:w]
 	im_r = img[2*h : 3*h, 0:w]
 
+	# Using edges for alignment
+	ime_b = auto_canny(im_b)
+	ime_g = auto_canny(im_g)
+	ime_r = auto_canny(im_r)
+
 	# Calculate offset using cross correlation
-	offig, offjg = match_offset(im_b, im_g, crop, movement)
-	offir, offjr = match_offset(im_b, im_r, crop, movement)
+	offig, offjg = match_offset(ime_b, ime_g, crop, movement)
+	offir, offjr = match_offset(ime_b, ime_r, crop, movement)
 
 	# Create reconstruct image
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)

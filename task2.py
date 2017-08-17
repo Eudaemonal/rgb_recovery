@@ -83,9 +83,21 @@ def img_pyramid(img, min_reso):
 	return img_arr
 
 
+def auto_canny(image, sigma=0.33):
+	# compute the median of the single channel pixel intensities
+	v = np.median(image)
+ 
+	# apply automatic Canny edge detection using the computed median
+	lower = int(max(0, (1.0 - sigma) * v))
+	upper = int(min(255, (1.0 + sigma) * v))
+	edged = cv2.Canny(image, lower, upper)
+ 
+	# return the edged image
+	return edged
+
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/s1.jpg',0)
+	img = cv2.imread('./DataSamples/h1.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
@@ -93,17 +105,22 @@ if __name__ == "__main__":
 	w = width
 	movement = 2
 	crop = 20
-	min_reso = int(w/10)
+	min_reso = int(w/20)
 
 	# Create array of RGB values
 	im_b = img[0 : h, 0:w] 
 	im_g = img[h : 2*h, 0:w]
 	im_r = img[2*h : 3*h, 0:w]
 
+	# Using edges for alignment
+	ime_b = auto_canny(im_b)
+	ime_g = auto_canny(im_g)
+	ime_r = auto_canny(im_r)
+
 	# Construct image pyramid
-	arr_b = img_pyramid(im_b, min_reso)
-	arr_g = img_pyramid(im_g, min_reso)
-	arr_r = img_pyramid(im_r, min_reso)
+	arr_b = img_pyramid(ime_b, min_reso)
+	arr_g = img_pyramid(ime_g, min_reso)
+	arr_r = img_pyramid(ime_r, min_reso)
 
 	idx = len(arr_g) -1
 	

@@ -137,9 +137,14 @@ if __name__ == "__main__":
 	im_g = img[h :2*h, 0:w]
 	im_r = img[2*h : 3*h, 0:w]
 
+	# Using edges for alignment
+	ime_b = auto_canny(im_b)
+	ime_g = auto_canny(im_g)
+	ime_r = auto_canny(im_r)
+
 	# Calculate offset using cross correlation
-	offig, offjg = match_offset(im_b, im_g, crop, movement)
-	offir, offjr = match_offset(im_b, im_r, crop, movement)
+	offig, offjg = match_offset(ime_b, ime_g, crop, movement)
+	offir, offjr = match_offset(ime_b, ime_r, crop, movement)
 
 	# Create reconstruct image
 	rec_img = img_reconstruct(im_b, im_g, im_r, offjg, offig, offjr, offir)
