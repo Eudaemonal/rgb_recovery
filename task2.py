@@ -97,7 +97,7 @@ def auto_canny(image, sigma=0.33):
 
 
 if __name__ == "__main__":
-	img = cv2.imread('./DataSamples/h2.jpg',0)
+	img = cv2.imread('./DataSamples/s1.jpg',0)
 
 	# Variable init
 	height, width = img.shape 
